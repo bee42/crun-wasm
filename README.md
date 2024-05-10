@@ -1,4 +1,6 @@
-# Use different Container Runtimes inside the same POD - CRUN with WASMedge
+# Utilize a polyglot container runtime for your pods
+
+We want combine CRUN with WASM plugins to use process container side by side with wasm modules.
 
 ## Once upon a time
 
@@ -20,7 +22,7 @@ And so, Gina's journey stands as a powerful affirmation of the spirit of innovat
 
 __A glimpse into the future of ChatGPT based tech writing: Envisioning the next chapter of what is todo. Nice!__
 
-## Describe the Container Runtime challenge more technically
+## Describe the polygot Container Runtime challenge more technically
 
 The topic of AI workload and enhancing the robustness of web applications through WebAssembly (WASM) modules is gaining significant traction. At the recent KubeCon, KubeSpin made headlines by unveiling their initiative to integrate WASM into Kubernetes clusters.
 
