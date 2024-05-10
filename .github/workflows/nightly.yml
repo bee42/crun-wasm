@@ -1,0 +1,30 @@
+name: Nightly Test
+
+# Run the nightly tests at at 7 AM UTC
+on:
+  schedule:
+    - cron: "0 11 * * *"
+jobs:
+  docker:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - 
+        uses: FranzDiebold/github-env-vars-action@v2
+      -   
+        name: Login to GitHub Packages Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}        
+      - 
+        name: build local image and let it run
+        run: |
+          make dev
+          echo ${DEV_IMAGE}
+          docker image push ${DEV_IMAGE}
+        env:
+          DEV_IMAGE: ghcr.io/bee42/crun-wasm/kindest-node:nightly
+      

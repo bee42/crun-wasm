@@ -84,9 +84,9 @@ Read this to better learn why it works:
 
 ```shell
 # build the image - review [Dockerfile](kind/Dockerfile)
-docker build -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.2 ./kind
+docker build -t bee42/crun-wasm/kindest-node:v1.29.2 ./kind
 # create kind cluster
-cat <<EOF | kind create cluster --image=bee42/cnbc/crun-wasmedge/kindest-node:v1.29.2 --name crun-wasm --config=-
+cat <<EOF | kind create cluster --image=bee42/crun-wasm/kindest-node:v1.29.2 --name crun-wasm --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
@@ -102,15 +102,17 @@ EOF
 k apply -f kind/runtime.yaml
 
 # Try out a wasm hack...
+# Only work at amd64??
 kubectl run -it --rm --restart=Never wasi-demo \
   --image=wasmedge/example-wasi:latest \
   --annotations="module.wasm.image/variant=compat-smart" \
   /wasi_example_main.wasm 50000000
 
 # Build the [httpServer](http-server/Dockerfile)
-docker build -t bee42/cnbc/crun-wasmedge/warp-server ./http-server
+# work at amd64 and arm64
+docker build -t bee42/crun-wasm/warp-server ./http-server
 # Import the wasmedge-warp-server to Kind
-docker image save bee42/cnbc/crun-wasmedge/warp-server:latest -o kind/wasmedge-warp-server.tar 
+docker image save bee42/crun-wasm/warp-server:latest -o kind/wasmedge-warp-server.tar 
 docker cp kind/wasmedge-warp-server.tar crun-wasm-control-plane:/opt/wasmedge-warp-server.tar
 docker exec crun-wasm-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
 ```
@@ -122,7 +124,7 @@ docker build \
   --build-arg KIND_VERSION=1.29.1 \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
-  -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.1-crun-1.12-wasm-0.14.0-rc.4 ./kind
+  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind
 ```
 
 ```shell
@@ -130,7 +132,7 @@ docker build \
   --build-arg KIND_VERSION=1.29.2 \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.13.5 \
-  -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.2-crun-1.12-wasm-0.13.5 ./kind
+  -t bee42/crun-wasm/kindest-node:v1.29.2-crun-1.12-wasmedge-0.13.5 ./kind
 ```
 
 ## Exciting news! Mixed runtime loading inside a pod is now a reality
@@ -174,7 +176,7 @@ spec:
       - image: nginx
         name: nginx
       - name: wasm
-        image: bee42/cnbc/crun-wasmedge/warp-server
+        image: bee42/crun-wasm/warp-server
         imagePullPolicy: Never
         ports:
         - containerPort: 8080
@@ -212,14 +214,14 @@ curl localhost:8082/echo -XPOST -d 'Let us say: WASM with CRUN create happiness!
 ```shell
 # build the image - review [Dockerfile](k3s/Dockerfile)
 # this need time!
-docker build -t bee42/cnbc/crun-wasmedge/k3s:v1.29.3-k3s1 ./k3s
+docker build -t bee42/crun-wasm/k3s:v1.29.3-k3s1 ./k3s
 # Create a small demo wasm cluster with k3d
-k3d cluster create wasm --image=bee42/cnbc/crun-wasmedge/k3s:v1.29.3-k3s1
+k3d cluster create wasm --image=bee42/crun-wasm/k3s:v1.29.3-k3s1
 # Build the [httpServer](http-server/Dockerfile)
 # Review [echoserver](http-server/src/main.rs)
-docker build -t bee42/cnbc/crun-wasmedge/warp-server ./http-server
+docker build -t bee42/crun-wasm/warp-server ./http-server
 # Import the demo image
-k3d image import -c wasm bee42/cnbc/crun-wasmedge/warp-server
+k3d image import -c wasm bee42/crun-wasm/warp-server
 # Review runtime container.d configuration [config.toml.tmpl](k3s/config.toml.tmpl)
 docker exec k3d-wasm-server-0 /bin/sh -c "cat >/var/lib/rancher/k3s/agent/etc/containerd/config.toml"
 kubectl get runtimeclasses.node.k8s.io 
@@ -285,10 +287,10 @@ k3d delete cluster wasm
 Now Gina and Joe starts there day together with a smile :-)
 This isn't the end of the story; rather, it's a truly promising starting point.
 
-**You build IT, you run IT!**
+__You build IT, you run IT!__
 
 Regards,
-[`|-o-|` The pathfinder - Peter](mailto://peter.rossbach@bee42.com)
+[`|-o-|` Your minion tour guide - Peter](mailto://peter.rossbach@bee42.com)
 
 This project is power by bee42
 
