@@ -34,7 +34,7 @@ __Stopp__: It's highly unlikely that the issue is valid!
 
 A few days later: After encountering numerous posts, rumors, hints, and ideas, I've decided to embrace the challenge of constructing a CRUN WASM runtime.
 
-## Kickstart a __HACK__...
+## Kickstart a Container Runtime __HACK__...
 
 Formulate a developer challenge:
 
@@ -115,14 +115,22 @@ docker cp kind/wasmedge-warp-server.tar crun-wasm-control-plane:/opt/wasmedge-wa
 docker exec crun-wasm-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
 ```
 
-Create a image with spezical releases
+Create a image with spezical older releases of Kind 1.29.1, and ...
 
 ```shell
 docker build \
   --build-arg KIND_VERSION=1.29.1 \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
-  -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.1-wasm-0.14.0-rc.4 ./kind
+  -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.1-crun-1.12-wasm-0.14.0-rc.4 ./kind
+```
+
+```shell
+docker build \
+  --build-arg KIND_VERSION=1.29.2 \
+  --build-arg CRUN_VERSION=1.12 \
+  --build-arg WASMEDGE_VERSION=0.13.5 \
+  -t bee42/cnbc/crun-wasmedge/kindest-node:v1.29.2-crun-1.12-wasm-0.13.5 ./kind
 ```
 
 ## Exciting news! Mixed runtime loading inside a pod is now a reality
@@ -141,8 +149,8 @@ Happy coding: Hope my example works for you!
 
 ```shell
 #kubectl ctx k3d-wasm
-kubectl ctx kind-crun-wasm
 kubectl create namespace demo
+kubectl ctx kind-crun-wasm
 kubectl ns demo
 cat <<EOF | kubectl apply -n demo -f -
 apiVersion: apps/v1
