@@ -1,6 +1,11 @@
+# More Github Action
+
 * https://dev.to/cloudx/multi-arch-docker-images-the-easy-way-with-github-actions-4k54
 * https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
-  
+* https://dev.to/willvelida/pushing-container-images-to-github-container-registry-with-github-actions-1m6b
+
+## Publish to Docker hub
+
 ```yaml
 name: Build
 

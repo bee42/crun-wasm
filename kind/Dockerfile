@@ -17,8 +17,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt update --fix-missing \
     && make 
 
 FROM kindest/node:v$KIND_VERSION
+ARG BUILD_DATE
+ARG BUILD_REVISION
+LABEL org.opencontainers.image.vendor="bee42 solutions gmbh"
+LABEL org.opencontainers.image.authors="peter.rossbach@bee42.com"
+LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.source="https://github.com/bee42/crun-wasm"
 COPY --from=builder /data/crun/crun /usr/local/sbin/crun
 COPY --from=builder /usr/local/lib/libwasmedge.so /usr/local/lib/libwasmedge.so
 RUN echo "Installing Packages ..." \
     && bash -c 'cat <<< $(jq "del(.hooks.createContainer)" /etc/containerd/cri-base.json) > /etc/containerd/cri-base.json' \
     && ldconfig
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.revision="${BUILD_REVISION}"
