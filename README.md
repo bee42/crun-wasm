@@ -83,7 +83,7 @@ Read this to better learn why it works:
   * Quickstart
 
 ```shell
-# build the image - review [Dockerfile](kind/Dockerfile)
+# build the image - review [Dockerfile](kind//wasmedge/Dockerfile)
 docker build -t bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 ./kind/wasmedge
 # create kind cluster
 cat <<EOF | kind create cluster --image=bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 --name crun-wasm --config=-
@@ -200,6 +200,53 @@ curl localhost:8081
 curl localhost:8082/echo -XPOST -d 'Let us say: WASM with CRUN create happiness!'
 ```
 
+### Wasmer support (untested)
+
+```shell
+# build the image - review [Dockerfile](kind//wasmer/Dockerfile)
+docker build -t bee42/crun-wasm/kindest-node:wasmer-v1.29.2 ./kind/wasmer
+```
+
+* Add sample application different languages (rust,c)
+* Understand different engines
+* Setup different crun runtimes same node?
+  * change runtime names?
+
+Example config (untested)
+
+```yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun-wasmer"]
+    runtime_type = "io.containerd.runc.v2"
+    pod_annotations = ["*.wasm.*", "wasm.*", "module.wasm.image/*", "*.module.wasm.image", "module.wasm.image/variant.*"]
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun-wasmer".options]
+    BinaryName = "/usr/local/sbin/crun-wasmer"
+    SystemdCgroup = false
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun-wasmedge"]
+    runtime_type = "io.containerd.runc.v2"
+    pod_annotations = ["*.wasm.*", "wasm.*", "module.wasm.image/*", "*.module.wasm.image", "module.wasm.image/variant.*"]
+  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun-wasmedge".options]
+    BinaryName = "/usr/local/sbin/crun-wasmedge"
+    SystemdCgroup = false
+```
+
+```yaml
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: crun-wasmedge
+handler: crun-wasmedge
+---
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: crun-wasmer
+handler: crun-wasmer
+```
+
 ## Kickstart with CRUN-WASM at K3s (doesn't work)
 
 * https://github.com/KWasm/kwasm-operator
@@ -283,6 +330,8 @@ k3d delete cluster wasm
   * Implement Linkerd proxy injection.
 * Include relevant pictures.
 * Create a working example with CRI-O.
+* Add Kubespin example
+* Add examples wasmer, spin, wasmtime
 
 Now Gina and Joe starts there day together with a smile :-)
 This isn't the end of the story; rather, it's a truly promising starting point.
