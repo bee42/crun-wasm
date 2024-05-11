@@ -77,4 +77,4 @@ curl http://127.0.0.1:8081
 ```
 
 Regards,
-[`|-o-|` The pathfinder - Peter](mailto://peter.rossbach@bee42.com)
+[`|-o-|` Your tour guide - Peter](mailto://peter.rossbach@bee42.com)

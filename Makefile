@@ -14,8 +14,8 @@ GIT_SHA=$(shell git rev-parse --short HEAD)
 # When you create your secret use the DockerHub in the name and this will find it
 REPO?=$(shell basename ${PWD})
 TAG?=${GIT_TAG}
-DEV_IMAGE?=${REPO}/kindest-node:dev
-PROD_IMAGE?=bee42/crun-wasm/kindest-node:${TAG}
+DEV_IMAGE?=${REPO}/kindest-node:wasmedge-dev
+PROD_IMAGE?=bee42/crun-wasm/kindest-node:wasmedge-${TAG}
 
 # Local development happens here!
 .PHONY: dev
@@ -24,7 +24,7 @@ dev:
 	@docker buildx build --tag ${DEV_IMAGE} \
 	--build-arg BUILD_DATE=${BUILD_DATE} \
 	--build-arg BUILD_REVISION=${GIT_SHA} \
-	--load ./kind
+	--load ./kind/wasmedge
 
 # Build a production image for the application.
 .PHONY: build
@@ -33,7 +33,7 @@ build:
 	--build-arg BUILD_DATE=${BUILD_DATE} \
 	--build-arg BUILD_REVISION=${GIT_SHA} \
 	--platform linux/amd64,linux/arm64 \
-	--tag ${PROD_IMAGE} .
+	--tag ${PROD_IMAGE} ./kind/wasmedge
 
 # Push the production image to a registry.
 .PHONY: push
@@ -42,7 +42,7 @@ push:
 	--build-arg BUILD_DATE=${BUILD_DATE} \
 	--build-arg BUILD_REVISION=${GIT_SHA} \
 	--platform linux/amd64,linux/arm64 \
-	--push --tag ${PROD_IMAGE} .
+	--push --tag ${PROD_IMAGE} ./kind/wasmedge
 
 # create a local multi arch buildx builder
 .PHONY: builder

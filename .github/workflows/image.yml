@@ -31,9 +31,9 @@ jobs:
         id: prep
         run: |
           DOCKER_IMAGE=ghcr.io/bee42/${{ github.event.repository.name }}/kindest-node
-          VERSION=edge
+          VERSION=wasmedge-edge
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=nightly
+            VERSION=wasmedge-nightly
           fi
           TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:${CI_SHA_SHORT}"
           echo ::set-output name=tags::${TAGS}
@@ -75,8 +75,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: ./kind
-          file: ./kind/Dockerfile
+          context: ./kind/wasmedge
+          file: ./kind/wasmedge/Dockerfile
           platforms: linux/amd64,linux/arm64
           build-args: |
             BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')

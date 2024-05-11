@@ -84,9 +84,9 @@ Read this to better learn why it works:
 
 ```shell
 # build the image - review [Dockerfile](kind/Dockerfile)
-docker build -t bee42/crun-wasm/kindest-node:v1.29.2 ./kind
+docker build -t bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 ./kind/wasmedge
 # create kind cluster
-cat <<EOF | kind create cluster --image=bee42/crun-wasm/kindest-node:v1.29.2 --name crun-wasm --config=-
+cat <<EOF | kind create cluster --image=bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 --name crun-wasm --config=-
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 containerdConfigPatches:
@@ -99,7 +99,7 @@ containerdConfigPatches:
     SystemdCgroup = false
 EOF
 # Configure [runtimes](kind/runtime.yaml) 
-k apply -f kind/runtime.yaml
+k apply -f kind/wasmedge/runtime.yaml
 
 # Try out a wasm hack...
 # Only work at amd64??
@@ -108,9 +108,9 @@ kubectl run -it --rm --restart=Never wasi-demo \
   --annotations="module.wasm.image/variant=compat-smart" \
   /wasi_example_main.wasm 50000000
 
-# Build the [httpServer](http-server/Dockerfile)
+# Build the [httpServer](warp-server/Dockerfile)
 # work at amd64 and arm64
-docker build -t bee42/crun-wasm/warp-server ./http-server
+docker build -t bee42/crun-wasm/warp-server ./warp-server
 # Import the wasmedge-warp-server to Kind
 docker image save bee42/crun-wasm/warp-server:latest -o kind/wasmedge-warp-server.tar 
 docker cp kind/wasmedge-warp-server.tar crun-wasm-control-plane:/opt/wasmedge-warp-server.tar
@@ -124,7 +124,7 @@ docker build \
   --build-arg KIND_VERSION=1.29.1 \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
-  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind
+  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind/wasmedge
 ```
 
 ```shell
@@ -132,7 +132,7 @@ docker build \
   --build-arg KIND_VERSION=1.29.2 \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.13.5 \
-  -t bee42/crun-wasm/kindest-node:v1.29.2-crun-1.12-wasmedge-0.13.5 ./kind
+  -t bee42/crun-wasm/kindest-node:v1.29.2-crun-1.12-wasmedge-0.13.5 ./kind/wasmedge
 ```
 
 ## Exciting news! Mixed runtime loading inside a pod is now a reality
