@@ -333,14 +333,26 @@ k3d delete cluster wasm
 * Add Kubespin example
 * Add examples wasmer, spin, wasmtime
 
+## Let us work together
+
 Now Gina and Joe starts there day together with a smile :-)
 This isn't the end of the story; rather, it's a truly promising starting point.
 
 __You build IT, you run IT!__
 
+Your contributions are welcome.
+
+Unless you explicitly state otherwise, any contribution you intentionally submitted for inclusion in current work, as defined in the Apache-2.0 license, without any additional terms or conditions.
+
+Feel free to submit a [pull request](https://github.com/bee42/crun-wasm/pulls) or file an [issue](https://github.com/bee42/crun-wasm/issues).
+
+## License
+
+This work is primarily distributed under the terms of the ![Apache License (Version 2.0)](LICENSE).
+
 Regards,
-[`|-o-|` Your minion tour guide - Peter](mailto://peter.rossbach@bee42.com)
+[`|-o-|` Your humble sign painter - Peter](mailto://peter.rossbach@bee42.com)
 
-This project is power by bee42
+This project is power by bee42.
 
-![bee42 solutions gmbh](images/bee42-logo.png)
+© 2024 present by ![bee42 solutions gmbh](images/bee42-logo.png)
