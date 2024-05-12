@@ -347,7 +347,7 @@ Feel free to submit a [pull request](https://github.com/bee42/crun-wasm/pulls) o
 
 ## License
 
-This work is primarily distributed under the terms of the ![Apache License 2.0](https://github.com/bee42/crun-wasm/blob/main/LICENSE.txt).
+This work is primarily distributed under the terms of the [Apache License 2.0](LICENSE).
 
 Regards,
 [`|-o-|` Your humble sign painter - Peter](mailto://peter.rossbach@bee42.com)
