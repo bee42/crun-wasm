@@ -30,10 +30,10 @@ jobs:
         name: Prepare
         id: prep
         run: |
-          DOCKER_IMAGE=ghcr.io/bee42/${{ github.event.repository.name }}/kindest-node
-          VERSION=wasmedge-edge
+          DOCKER_IMAGE=ghcr.io/bee42/${{ github.event.repository.name }}/kindest-minion-wasmedge
+          VERSION=edge
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=wasmedge-nightly
+            VERSION=nightly
           fi
           TAGS="${DOCKER_IMAGE}:${VERSION},${DOCKER_IMAGE}:${CI_SHA_SHORT}"
           echo ::set-output name=tags::${TAGS}

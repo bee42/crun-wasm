@@ -84,22 +84,14 @@ Read this to better learn why it works:
 
 ```shell
 # build the image - review [Dockerfile](kind//wasmedge/Dockerfile)
-docker build -t bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 ./kind/wasmedge
+docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 ./kind/wasmedge
 # create kind cluster
-cat <<EOF | kind create cluster --image=bee42/crun-wasm/kindest-node:wasmedge-v1.29.2 --name crun-wasm --config=-
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-containerdConfigPatches:
-- |-
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun"]
-    runtime_type = "io.containerd.runc.v2"
-    pod_annotations = ["*.wasm.*", "wasm.*", "module.wasm.image/*", "*.module.wasm.image", "module.wasm.image/variant.*"]
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."crun".options]
-    BinaryName = "/usr/local/sbin/crun"
-    SystemdCgroup = false
-EOF
+kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 \
+  --name wasmedge \
+  --config=./kind/wasmedge/wasmedge-config.yaml
+
 # Configure [runtimes](kind/runtime.yaml) 
-k apply -f kind/wasmedge/runtime.yaml
+k apply -f kind/wasmedge/wasmedge-runtime.yaml
 
 # Try out a wasm hack...
 # Only work at amd64??
@@ -113,8 +105,8 @@ kubectl run -it --rm --restart=Never wasi-demo \
 docker build -t bee42/crun-wasm/warp-server ./warp-server
 # Import the wasmedge-warp-server to Kind
 docker image save bee42/crun-wasm/warp-server:latest -o kind/wasmedge-warp-server.tar 
-docker cp kind/wasmedge-warp-server.tar crun-wasm-control-plane:/opt/wasmedge-warp-server.tar
-docker exec crun-wasm-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
+docker cp kind/wasmedge-warp-server.tar wasmedge-control-plane:/opt/wasmedge-warp-server.tar
+docker exec wasmedge-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
 ```
 
 Create a image with spezical older releases of Kind 1.29.1, and ...
@@ -125,7 +117,7 @@ docker build \
   --build-arg CRUN_VERSION=1.12 \
   --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
   -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind/wasmedge
-```
+``` 
 
 ```shell
 docker build \
@@ -152,7 +144,7 @@ Happy coding: Hope my example works for you!
 ```shell
 #kubectl ctx k3d-wasm
 kubectl create namespace demo
-kubectl ctx kind-crun-wasm
+kubectl ctx kind-wasmedge
 kubectl ns demo
 cat <<EOF | kubectl apply -n demo -f -
 apiVersion: apps/v1
@@ -175,6 +167,7 @@ spec:
       containers:
       - image: nginx
         name: nginx
+        imagePullPolicy: Always
       - name: wasm
         image: bee42/crun-wasm/warp-server
         imagePullPolicy: Never
@@ -307,14 +300,14 @@ Fix this to copy all LDD deps :) ARGGSS....
   Warning  BackOff    2s (x2 over 15s)  kubelet            Back-off restarting failed container wasm in pod wasmedge-warp-server-59fd75f8b7-p5t65_demo(33c0c4e5-86ba-488b-93dd-4e0b184d114e)
 ```
 
-## Teardown the walls
+## Teardown the walls and try again
 
 ```shell
 kind delete cluster --name crun-wasm
 k3d delete cluster wasm
 ```
 
-## Todo
+## The rooms of improvments
 
 * Fix K3d/K3s integration (Prio)
 * Test real installations (k3s and kubeadm-based).
@@ -331,7 +324,7 @@ k3d delete cluster wasm
 * Include relevant pictures.
 * Create a working example with CRI-O.
 * Add Kubespin example
-* Add examples wasmer, spin, wasmtime
+* Add examples for other wasm runtimes like wasmer, spin, wasmtime
 
 ## Let us work together
 
@@ -348,11 +341,11 @@ Feel free to submit a [pull request](https://github.com/bee42/crun-wasm/pulls) o
 
 ## License
 
-This work is primarily distributed under the terms of the ![Apache License (Version 2.0)](./LICENSE).
+This work is primarily distributed under the terms of the ![Apache License (Version 2.0)](./LICENSE.txt).
 
 Regards,
 [`|-o-|` Your humble sign painter - Peter](mailto://peter.rossbach@bee42.com)
 
-This project is power by bee42.
+This project is power by [bee42](https://bee42.com).
 
 © 2024 present by ![bee42 solutions gmbh](images/bee42-logo.png)

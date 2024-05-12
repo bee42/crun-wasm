@@ -26,5 +26,5 @@ jobs:
           echo ${DEV_IMAGE}
           docker image push ${DEV_IMAGE}
         env:
-          DEV_IMAGE: ghcr.io/bee42/crun-wasm/kindest-node:wasmedge-dev-nightly
+          DEV_IMAGE: ghcr.io/bee42/crun-wasm/kindest-minion-wasmedge:dev-nightly
       

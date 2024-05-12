@@ -14,8 +14,8 @@ GIT_SHA=$(shell git rev-parse --short HEAD)
 # When you create your secret use the DockerHub in the name and this will find it
 REPO?=$(shell basename ${PWD})
 TAG?=${GIT_TAG}
-DEV_IMAGE?=${REPO}/kindest-node:wasmedge-dev
-PROD_IMAGE?=bee42/crun-wasm/kindest-node:wasmedge-${TAG}
+DEV_IMAGE?=${REPO}/kindest-minion-wasmedge:dev
+PROD_IMAGE?=bee42/crun-wasm/kindest-minion-wasmedge:${TAG}
 
 # Local development happens here!
 .PHONY: dev

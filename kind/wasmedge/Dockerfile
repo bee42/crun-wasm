@@ -22,10 +22,10 @@ RUN cd crun \
 FROM kindest/node:v$KIND_VERSION
 ARG BUILD_DATE
 ARG BUILD_REVISION
-LABEL org.opencontainers.image.title="kindest crun wasmedge node"
+LABEL org.opencontainers.image.title="kindest minion crun wasmedge"
 LABEL org.opencontainers.image.vendor="bee42 solutions gmbh"
 LABEL org.opencontainers.image.authors="peter.rossbach@bee42.com"
-LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.source="https://github.com/bee42/crun-wasm"
 COPY --from=builder /data/crun/crun /usr/local/sbin/crun
 COPY --from=builder /usr/local/lib/libwasmedge.so /usr/local/lib/libwasmedge.so
