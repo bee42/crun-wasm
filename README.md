@@ -82,6 +82,8 @@ Read this to better learn why it works:
 * https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries
   * Quickstart
 
+### Create wasmedge cluster
+
 ```shell
 # build the image - review [Dockerfile](kind//wasmedge/Dockerfile)
 docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 ./kind/wasmedge
@@ -90,7 +92,7 @@ kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 \
   --name wasmedge \
   --config=./kind/wasmedge/wasmedge-config.yaml
 
-# Configure [runtimes](kind/runtime.yaml) 
+# Configure [runtimes](wasmedge/wasmedge-runtime.yaml) 
 k apply -f kind/wasmedge/wasmedge-runtime.yaml
 
 # Try out a wasm hack...
@@ -99,7 +101,11 @@ kubectl run -it --rm --restart=Never wasi-demo \
   --image=wasmedge/example-wasi:latest \
   --annotations="module.wasm.image/variant=compat-smart" \
   /wasi_example_main.wasm 50000000
+```
 
+### Prepare warp-server example
+
+```shell
 # Build the [httpServer](warp-server/Dockerfile)
 # work at amd64 and arm64
 docker build -t bee42/crun-wasm/warp-server ./warp-server
@@ -109,25 +115,7 @@ docker cp kind/wasmedge-warp-server.tar wasmedge-control-plane:/opt/wasmedge-war
 docker exec wasmedge-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
 ```
 
-Create a image with spezical older releases of Kind 1.29.1, and ...
-
-```shell
-docker build \
-  --build-arg KIND_VERSION=1.29.1 \
-  --build-arg CRUN_VERSION=1.12 \
-  --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
-  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind/wasmedge
-``` 
-
-```shell
-docker build \
-  --build-arg KIND_VERSION=1.29.2 \
-  --build-arg CRUN_VERSION=1.12 \
-  --build-arg WASMEDGE_VERSION=0.13.5 \
-  -t bee42/crun-wasm/kindest-node:v1.29.2-crun-1.12-wasmedge-0.13.5 ./kind/wasmedge
-```
-
-## Exciting news! Mixed runtime loading inside a pod is now a reality
+### Exciting news! Mixed runtime loading inside a pod is now a reality
 
 Begin your WASM development journey with the combined CRUN/Wasmedge runtime. Now, leverage standard init and sidecar containers for:
 
@@ -193,6 +181,24 @@ curl localhost:8081
 curl localhost:8082/echo -XPOST -d 'Let us say: WASM with CRUN create happiness!'
 ```
 
+### Create a image with spezical older releases of Kind 1.29.1
+
+```shell
+docker build \
+  --build-arg KIND_VERSION=1.29.1 \
+  --build-arg CRUN_VERSION=1.12 \
+  --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
+  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind/wasmedge
+``` 
+
+```shell
+docker build \
+  --build-arg KIND_VERSION=1.29.2 \
+  --build-arg CRUN_VERSION=1.12 \
+  --build-arg WASMEDGE_VERSION=0.13.5 \
+  -t bee42/crun-wasm/kindest-node:v1.29.2-crun-1.12-wasmedge-0.13.5 ./kind/wasmedge
+```
+
 ### Wasmer support (untested)
 
 ```shell
@@ -240,7 +246,7 @@ metadata:
 handler: crun-wasmer
 ```
 
-## Kickstart with CRUN-WASM at K3s (doesn't work)
+## Kickstart with CRUN-WASM at K3s (doesn't work today with k3d images)
 
 * https://github.com/KWasm/kwasm-operator
 * https://github.com/WasmEdge/WasmEdge/releases
@@ -303,11 +309,11 @@ Fix this to copy all LDD deps :) ARGGSS....
 ## Teardown the walls and try again
 
 ```shell
-kind delete cluster --name crun-wasm
+kind delete cluster --name wasmedge
 k3d delete cluster wasm
 ```
 
-## The rooms of improvments
+## List of possible improvments
 
 * Fix K3d/K3s integration (Prio)
 * Test real installations (k3s and kubeadm-based).
@@ -341,7 +347,7 @@ Feel free to submit a [pull request](https://github.com/bee42/crun-wasm/pulls) o
 
 ## License
 
-This work is primarily distributed under the terms of the ![Apache License (Version 2.0)](./LICENSE.txt).
+This work is primarily distributed under the terms of the ![Apache License 2.0](LICENSE.txt).
 
 Regards,
 [`|-o-|` Your humble sign painter - Peter](mailto://peter.rossbach@bee42.com)
