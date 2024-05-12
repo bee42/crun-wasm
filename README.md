@@ -26,7 +26,7 @@ __A glimpse into the future of ChatGPT based tech writing: Envisioning the next 
 
 The topic of AI workload and enhancing the robustness of web applications through WebAssembly (WASM) modules is gaining significant traction. At the recent KubeCon, KubeSpin made headlines by unveiling their initiative to integrate WASM into Kubernetes clusters.
 
-My preferred Kubernetes distribution, k3s, now seamlessly supports all WASM runtimes by default. The installation of WebAssembly runtimes has become effortlessly achievable with the [KWasm|(https://github.com/KWasm/kwasm-operator) operator, sparking enthusiasm and fostering a wave of innovation.
+My preferred Kubernetes distribution, k3s, now seamlessly supports all WASM runtimes by default. The installation of WebAssembly runtimes has become effortlessly achievable with the [KWasm](https://github.com/KWasm/kwasm-operator) operator, sparking enthusiasm and fostering a wave of innovation.
 
 However, a limitation arises within Pods: only a single runtime can be selected for the containers within. This means that mixing WASM modules with traditional images isn't feasible. This restriction curtails the use of sidecars, initContainers, or injection of secrets and service meshes for WASM applications, posing a significant challenge for developers.
 
@@ -34,7 +34,7 @@ __Stopp__: It's highly unlikely that the issue is valid!
 
 A few days later: After encountering numerous posts, rumors, hints, and ideas, I've decided to embrace the challenge of constructing a CRUN WASM runtime.
 
-## Kickstart a Container Runtime __HACK__...
+## Kickstart a Container Runtime __HACK__
 
 Formulate a developer challenge:
 
@@ -347,7 +347,7 @@ Feel free to submit a [pull request](https://github.com/bee42/crun-wasm/pulls) o
 
 ## License
 
-This work is primarily distributed under the terms of the ![Apache License 2.0](LICENSE.txt).
+This work is primarily distributed under the terms of the ![Apache License 2.0](https://github.com/bee42/crun-wasm/blob/main/LICENSE.txt).
 
 Regards,
 [`|-o-|` Your humble sign painter - Peter](mailto://peter.rossbach@bee42.com)
