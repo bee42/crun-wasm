@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasmedge-warp-server
+  labels:
+    app: wasmedge-warp-server
+spec:
+  selector:
+    matchLabels:
+      app: wasmedge-warp-server
+  template:
+    metadata:
+      labels:
+        app: wasmedge-warp-server
+      annotations:
+        module.wasm.image/variant: compat-smart
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        imagePullPolicy: Always
+      - name: wasm
+        image: bee42/crun-wasm/warp-server
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: 8008
+          initialDelaySeconds: 3
+          periodSeconds: 30
+      runtimeClassName: crun
