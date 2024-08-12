@@ -1,13 +1,12 @@
-ARG KIND_VERSION=1.29.2
-ARG CRUN_VERSION
-ARG WASMEDGE_VERSION
+ARG KIND_VERSION=1.30.2
 
 # get wasmedge and compile crun
 FROM debian:bullseye AS builder
 WORKDIR /data
-ENV CRUN_VERSION=${CRUN_VERSION:-1.15}
-ENV WASMEDGE_VERSION=${WASMEDGE_VERSION:-0.13.5}
-
+ARG CRUN_VERSION=1.16
+ARG WASMEDGE_VERSION=0.14.0
+ENV CRUN_VERSION=${CRUN_VERSION}
+ENV WASMEDGE_VERSION=${WASMEDGE_VERSION}
 RUN DEBIAN_FRONTEND=noninteractive apt update --fix-missing \
     && DEBIAN_FRONTEND=noninteractive apt install  -y curl make git gcc build-essential pkgconf libtool libsystemd-dev libprotobuf-c-dev libcap-dev libseccomp-dev libyajl-dev go-md2man libtool autoconf python3 automake \
     && curl https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -p /usr/local --version=${WASMEDGE_VERSION} \

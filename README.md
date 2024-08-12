@@ -86,9 +86,17 @@ Read this to better learn why it works:
 
 ```shell
 # build the image - review [Dockerfile](kind//wasmedge/Dockerfile)
-docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 ./kind/wasmedge
+#CRUN_VERSION=1.16
+#WASMEDGE_VERSION=0.14.0
+#KIND_VERSION=1.30.2
+BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+GIT_SHA=$(git rev-parse --short HEAD)
+docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.30.2 \
+  --build-arg BUILD_DATE=${BUILD_DATE} \
+  --build-arg BUILD_REVISION=${GIT_SHA} \
+  ./kind/wasmedge
 # create kind cluster
-kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.29.2 \
+kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.30.2 \
   --name wasmedge \
   --config=./kind/wasmedge/wasmedge-config.yaml
 
@@ -134,6 +142,9 @@ Happy coding: Hope my example works for you!
 kubectl create namespace demo
 kubectl ctx kind-wasmedge
 kubectl ns demo
+k apply -f warp-server/k8s/deployment.yaml
+
+# or
 cat <<EOF | kubectl apply -n demo -f -
 apiVersion: apps/v1
 kind: Deployment
@@ -186,10 +197,10 @@ curl localhost:8082/echo -XPOST -d 'Let us say: WASM with CRUN create happiness!
 ```shell
 docker build \
   --build-arg KIND_VERSION=1.29.1 \
-  --build-arg CRUN_VERSION=1.12 \
-  --build-arg WASMEDGE_VERSION=0.14.0-rc.4 \
-  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.12-wasmedge-0.14.0-rc.4 ./kind/wasmedge
-``` 
+  --build-arg CRUN_VERSION=1.16 \
+  --build-arg WASMEDGE_VERSION=0.14.1-rc.1 \
+  -t bee42/crun-wasm/kindest-node:v1.29.1-crun-1.16-wasmedge-0.14.1-rc.1 ./kind/wasmedge
+```
 
 ```shell
 docker build \

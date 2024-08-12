@@ -1,4 +1,4 @@
-FROM rust:1.74 as builder
+FROM rust:1.74 AS builder
 RUN rustup target add wasm32-wasi
 WORKDIR /src/
 COPY . .
