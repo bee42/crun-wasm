@@ -120,7 +120,7 @@ docker build -t bee42/crun-wasm/warp-server ./warp-server
 # Import the wasmedge-warp-server to Kind
 docker image save bee42/crun-wasm/warp-server:latest -o kind/wasmedge-warp-server.tar 
 docker cp kind/wasmedge-warp-server.tar wasmedge-control-plane:/opt/wasmedge-warp-server.tar
-docker exec wasmedge-control-plane ctr -n k8s.io image import  /opt/wasmedge-warp-server.tar
+docker exec wasmedge-control-plane ctr -n k8s.io image import /opt/wasmedge-warp-server.tar
 ```
 
 ### Exciting news! Mixed runtime loading inside a pod is now a reality
@@ -271,16 +271,16 @@ handler: crun-wasmer
 ```shell
 # build the image - review [Dockerfile](k3s/Dockerfile)
 # this need time!
-docker build -t bee42/crun-wasm/k3s:v1.29.3-k3s1 ./k3s
+docker build -t bee42/crun-wasm/k3s-minion-wasmedge:v1.30.2-k3s1 ./k3s
 # Create a small demo wasm cluster with k3d
-k3d cluster create wasm --image=bee42/crun-wasm/k3s:v1.29.3-k3s1
+k3d cluster create wasm --image=bee42/crun-wasm/k3s-minion-wasmedge:v1.30.2-k3s1
 # Build the [httpServer](http-server/Dockerfile)
 # Review [echoserver](http-server/src/main.rs)
 docker build -t bee42/crun-wasm/warp-server ./http-server
 # Import the demo image
 k3d image import -c wasm bee42/crun-wasm/warp-server
 # Review runtime container.d configuration [config.toml.tmpl](k3s/config.toml.tmpl)
-docker exec k3d-wasm-server-0 /bin/sh -c "cat >/var/lib/rancher/k3s/agent/etc/containerd/config.toml"
+docker exec k3d-wasm-server-0 /bin/sh -c "cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml"
 kubectl get runtimeclasses.node.k8s.io 
 NAME                  HANDLER               AGE
 crun                  crun                  4m43s
@@ -317,11 +317,32 @@ Fix this to copy all LDD deps :) ARGGSS....
   Warning  BackOff    2s (x2 over 15s)  kubelet            Back-off restarting failed container wasm in pod wasmedge-warp-server-59fd75f8b7-p5t65_demo(33c0c4e5-86ba-488b-93dd-4e0b184d114e)
 ```
 
+Troubleshooting
+
+* [cdebug](https://github.com/iximiuz/cdebug)
+
+```shell
+brew install cdebug
+cdebug exec --rm --privileged -it --image alpine:3.20 k3d-wasm-server-0
+ldd /opt/bin/crun
+        /lib/ld-musl-x86_64.so.1 (0x7f5831aa4000)
+        libseccomp.so.2 => /usr/lib/libseccomp.so.2 (0x7f58319fb000)
+        libcap.so.2 => /usr/lib/libcap.so.2 (0x7f58319f1000)
+        libc.musl-x86_64.so.1 => /lib/ld-musl-x86_64.so.1 (0x7f5831aa4000)
+exit
+k describe pod wasmedge-warp-server-76b7c4b898-gzzh6
+    Last State:     Terminated
+      Reason:       StartError
+      Message:      failed to create containerd task: failed to create shim task: OCI runtime create failed: could not load `libwasmedge.so.0`: `Error relocating /usr/local/lib/libwasmedge.so.0: mallinfo: symbol not found`: unknown
+```
+
+__Status__: No idea, Arrg Which lib is missing....
+
 ## Teardown the walls and try again
 
 ```shell
 kind delete cluster --name wasmedge
-k3d delete cluster wasm
+k3d cluster delete  wasm
 ```
 
 ## List of possible improvments
