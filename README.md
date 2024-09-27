@@ -86,22 +86,22 @@ Read this to better learn why it works:
 
 ```shell
 # build the image - review [Dockerfile](kind//wasmedge/Dockerfile)
-#CRUN_VERSION=1.16
-#WASMEDGE_VERSION=0.14.0
-#KIND_VERSION=1.30.2
+#CRUN_VERSION=1.17
+#WASMEDGE_VERSION=0.14.1
+#KIND_VERSION=1.30.4
 BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_SHA=$(git rev-parse --short HEAD)
-docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.30.2 \
+docker build -t bee42/crun-wasm/kindest-minion-wasmedge:v1.30.4 \
   --build-arg BUILD_DATE=${BUILD_DATE} \
   --build-arg BUILD_REVISION=${GIT_SHA} \
   ./kind/wasmedge
 # create kind cluster
-kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.30.2 \
+kind create cluster --image=bee42/crun-wasm/kindest-minion-wasmedge:v1.30.4 \
   --name wasmedge \
   --config=./kind/wasmedge/wasmedge-config.yaml
 
 # Configure [runtimes](wasmedge/wasmedge-runtime.yaml) 
-k apply -f kind/wasmedge/wasmedge-runtime.yaml
+kubectl apply -f kind/wasmedge/wasmedge-runtime.yaml
 
 # Try out a wasm hack...
 # Only work at amd64??
@@ -142,7 +142,7 @@ Happy coding: Hope my example works for you!
 kubectl create namespace demo
 kubectl ctx kind-wasmedge
 kubectl ns demo
-k apply -f warp-server/k8s/deployment.yaml
+kubectl apply -f warp-server/k8s/deployment.yaml
 
 # or
 cat <<EOF | kubectl apply -n demo -f -
@@ -180,7 +180,7 @@ spec:
           periodSeconds: 30
       runtimeClassName: crun
 EOF
-k get pods -w
+kubectl get pods -w
 NAME                                    READY   STATUS              RESTARTS   AGE
 wasmedge-warp-server-54b8c587b5-86zjp   0/2     ContainerCreating   0          10s
 wasmedge-warp-server-54b8c587b5-86zjp   2/2     Running             0          51s
@@ -192,7 +192,7 @@ curl localhost:8081
 curl localhost:8082/echo -XPOST -d 'Let us say: WASM with CRUN create happiness!'
 ```
 
-### Create a image with spezical older releases of Kind 1.29.1
+### Create a image with special older releases of Kind 1.29.1
 
 ```shell
 docker build \
@@ -271,9 +271,12 @@ handler: crun-wasmer
 ```shell
 # build the image - review [Dockerfile](k3s/Dockerfile)
 # this need time!
-docker build -t bee42/crun-wasm/k3s-minion-wasmedge:v1.30.2-k3s1 ./k3s
+docker build -t bee42/crun-wasm/k3s-minion-wasmedge:v1.30.5-k3s1 ./k3s
 # Create a small demo wasm cluster with k3d
-k3d cluster create wasm --image=bee42/crun-wasm/k3s-minion-wasmedge:v1.30.2-k3s1
+k3d cluster create wasm --image=bee42/crun-wasm/k3s-minion-wasmedge:v1.30.5-k3s1
+# Troubleshooting
+# k3d cluster create wasm --image=bee42/crun-wasm/k3s-minion-wasmedge:v1.30.5-k3s1 --no-rollback
+# docker run -it --rm --entrypoint /bin/sh bee42/crun-wasm/k3s-minion-wasmedge:v1.30.5-k3s1
 # Build the [httpServer](http-server/Dockerfile)
 # Review [echoserver](http-server/src/main.rs)
 docker build -t bee42/crun-wasm/warp-server ./http-server
@@ -329,11 +332,18 @@ ldd /opt/bin/crun
         libseccomp.so.2 => /usr/lib/libseccomp.so.2 (0x7f58319fb000)
         libcap.so.2 => /usr/lib/libcap.so.2 (0x7f58319f1000)
         libc.musl-x86_64.so.1 => /lib/ld-musl-x86_64.so.1 (0x7f5831aa4000)
+/opt/bin/crun --version
+crun version 1.16
+commit: 2dc1598e7e56157b3414eb6c9f9efbb5ce9f5e44
+rundir: /run/crun
+spec: 1.0.0
++SELINUX +APPARMOR +CAP +SECCOMP +EBPF +WASM:wasmedge +YAJL
 exit
-k describe pod wasmedge-warp-server-76b7c4b898-gzzh6
+kubectl describe pod wasmedge-warp-server-76b7c4b898-gzzh6
     Last State:     Terminated
       Reason:       StartError
       Message:      failed to create containerd task: failed to create shim task: OCI runtime create failed: could not load `libwasmedge.so.0`: `Error relocating /usr/local/lib/libwasmedge.so.0: mallinfo: symbol not found`: unknown
+
 ```
 
 __Status__: No idea, Arrg Which lib is missing....
@@ -345,7 +355,7 @@ kind delete cluster --name wasmedge
 k3d cluster delete  wasm
 ```
 
-## List of possible improvments
+## List of possible improvements
 
 * Fix K3d/K3s integration (Prio)
 * Test real installations (k3s and kubeadm-based).
@@ -354,7 +364,7 @@ k3d cluster delete  wasm
 * Dockerfile: Enhance the copying of ldd libwasmedge.
   * Multiarch builds.
   * Update:
-    * WasmEdge to version 0.14.0-rc.4. (Check WasmEdge releases)
+    * WasmEdge to version 0.14.1 (Check WasmEdge releases)
     * Explore WasmEdge Plugins.
 * Create a enhance example:
   * Set up a WASM HTTP Server with a gitsync example.
